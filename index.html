@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>长资源</title>
+<meta name="theme-color" content="#0b0f14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="长资源">
+<meta name="description" content="长资源 · 4K 在线影视">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #0b0f14;
+    color: #e8edf2;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .splash { text-align: center; padding: 24px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  .logo {
+    width: 88px; height: 88px; margin: 0 auto 22px; border-radius: 22px;
+    background: linear-gradient(160deg, #161d26 0%, #0c1118 100%);
+    border: 1px solid rgba(255,255,255,.08);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 14px 44px rgba(0,0,0,.5);
+  }
+  .logo svg { width: 44px; height: 44px; }
+  .brand { font-size: 22px; font-weight: 600; letter-spacing: .5em; text-indent: .5em; color: #f2f5f8; }
+  .tag { margin-top: 9px; font-size: 12px; color: #7d8a99; letter-spacing: .18em; }
+  .spinner {
+    margin: 36px auto 0; width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.12); border-top-color: #f0b429;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hint { margin-top: 18px; font-size: 12px; color: #55616e; }
+</style>
+</head>
+<body>
+  <div class="splash">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
+        <path d="M8 5.5v13l11-6.5z" fill="#f0b429"/>
+      </svg>
+    </div>
+    <div class="brand">长资源</div>
+    <div class="tag">4K 在线影视</div>
+    <div class="spinner"></div>
+    <div class="hint">正在载入，请稍候…</div>
+  </div>
+
+<script>
+  // 展示品牌启动画面后，全屏进入目标网站（standalone 模式下保持独立 APP 窗口）
+  // 访问 index.html?preview=1 可停留在启动页预览，不跳转
+  var TARGET = 'https://www.cz4k.com/';
+  var PREVIEW = /[?&#]preview(=1)?/.test(location.href);
+  if (!PREVIEW) {
+    setTimeout(function () {
+      location.replace(TARGET);
+    }, 1500);
+  }
+
+  // 注册 Service Worker，使壳具备 PWA 可安装条件
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
