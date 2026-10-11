@@ -6,7 +6,6 @@
 <title>长资源</title>
 <meta name="theme-color" content="#0b0f14">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="长资源">
 <meta name="description" content="长资源 · 4K 在线影视">
@@ -16,6 +15,7 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
+  [hidden] { display: none !important; }
   body {
     background: #0b0f14;
     color: #e8edf2;
@@ -45,6 +45,22 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .hint { margin-top: 18px; font-size: 12px; color: #55616e; }
+  .enter-btn {
+    display: inline-block;
+    margin-top: 34px;
+    padding: 13px 46px;
+    border: 0; border-radius: 999px;
+    background: #f0b429; color: #14181f;
+    font-size: 17px; font-weight: 600; letter-spacing: .12em;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(240,180,41,.25);
+  }
+  .enter-btn:active { transform: scale(.97); }
+  .tip {
+    margin-top: 20px;
+    font-size: 13px; line-height: 1.7; color: #8b98a6;
+  }
+  .tip b { color: #f0b429; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -56,25 +72,49 @@
     </div>
     <div class="brand">长资源</div>
     <div class="tag">4K 在线影视</div>
-    <div class="spinner"></div>
-    <div class="hint">正在载入，请稍候…</div>
+
+    <!-- 已安装（standalone）：展示启动画面后自动全屏进入 -->
+    <div class="entering" id="entering">
+      <div class="spinner"></div>
+      <div class="hint">正在进入网站…</div>
+    </div>
+
+    <!-- 未安装（浏览器打开）：停留在此页，引导安装 -->
+    <div class="browser" id="browser" hidden>
+      <button type="button" class="enter-btn" id="enterBtn">进入网站</button>
+      <p class="tip">想全屏像 APP 一样使用？<br>点浏览器菜单 <b>「安装应用」</b>，<br>之后从手机桌面图标打开即可。</p>
+    </div>
   </div>
 
 <script>
-  // 展示品牌启动画面后，全屏进入目标网站（standalone 模式下保持独立 APP 窗口）
-  // 访问 index.html?preview=1 可停留在启动页预览，不跳转
   var TARGET = 'https://www.cz4k.com/';
-  var PREVIEW = /[?&#]preview(=1)?/.test(location.href);
-  if (!PREVIEW) {
-    setTimeout(function () {
-      location.replace(TARGET);
-    }, 1500);
+
+  // 提前注册 Service Worker，确保 Chrome 识别为可安装 PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
   }
 
-  // 注册 Service Worker，使壳具备 PWA 可安装条件
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
+  // 已安装（从桌面图标打开）时为 standalone 模式
+  var isStandalone = !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (window.navigator.standalone === true) { isStandalone = true; }
+
+  // 自检预览：URL 带 #preview 或 ?preview=1 时停留在本页
+  var PREVIEW = /[?&#]preview(=1)?/.test(location.href);
+
+  var entering = document.getElementById('entering');
+  var browser = document.getElementById('browser');
+
+  if (isStandalone && !PREVIEW) {
+    // 已安装：展示启动画面后全屏进入目标网站
+    setTimeout(function () {
+      location.replace(TARGET);
+    }, 1200);
+  } else {
+    // 未安装：停留在本页，等待用户安装或直接进入
+    entering.hidden = true;
+    browser.hidden = false;
+    document.getElementById('enterBtn').addEventListener('click', function () {
+      location.href = TARGET;
     });
   }
 </script>
